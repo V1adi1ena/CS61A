@@ -25,6 +25,10 @@ def num_eights(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    if n<10:
+        return int(n==8)
+    else:
+        return num_eights(n//10)+int(n%10==8)
 
 
 def digit_distance(n):
@@ -47,6 +51,13 @@ def digit_distance(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    if n<10:
+        return 0
+    elif n<100:
+        return abs(n%10-n//10)
+    else:
+        return digit_distance(n//10)+abs(n%10-n//10%10)
+
 
 
 def interleaved_sum(n, odd_func, even_func):
@@ -71,6 +82,11 @@ def interleaved_sum(n, odd_func, even_func):
     True
     """
     "*** YOUR CODE HERE ***"
+    def grow(m, n, f, g):
+        if m>n:
+            return 0
+        return grow(m+1, n, g, f)+f(m)
+    return grow(1, n, odd_func, even_func)
 
 
 def next_smaller_dollar(bill):
@@ -107,7 +123,16 @@ def count_dollars(total):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    def grow(n, total):
+        if n>total:
+            return 0
+        elif n==total:
+            return 1
+        elif n==100:
+            return grow(100, total-100)
+        else:
+            return grow(next_larger_dollar(n), total)+grow(n, total-n)
+    return grow(1, total)
 
 def next_larger_dollar(bill):
     """Returns the next larger bill in order."""
@@ -143,6 +168,16 @@ def count_dollars_upward(total):
     True
     """
     "*** YOUR CODE HERE ***"
+    def grow(n, total):
+        if n>total:
+            return 0
+        elif n==total:
+            return 1
+        elif n==100:
+            return grow(100, total-100)
+        else:
+            return grow(next_larger_dollar(n), total)+grow(n, total-n)
+    return grow(1, total)
 
 
 def print_move(origin, destination):
@@ -178,7 +213,12 @@ def move_stack(n, start, end):
     """
     assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
     "*** YOUR CODE HERE ***"
-
+    if n==1:
+        print_move(start, end)
+    else:
+        move_stack(n-1, start, 6-start-end)
+        print_move(start, end)
+        move_stack(n-1, 6-start-end, end)
 
 from operator import sub, mul
 
@@ -193,5 +233,6 @@ def make_anonymous_factorial():
     ...     ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
+    return (lambda f: f(f))(lambda f: lambda x: 1 if x == 0 else x * f(f)(x - 1))
 
+from CS61A import trace
