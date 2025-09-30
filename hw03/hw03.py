@@ -234,5 +234,3 @@ def make_anonymous_factorial():
     True
     """
     return (lambda f: f(f))(lambda f: lambda x: 1 if x == 0 else x * f(f)(x - 1))
-
-from CS61A import trace
