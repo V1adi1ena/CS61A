@@ -12,7 +12,6 @@ from ucb import main, interact, trace
 from datetime import datetime
 import random
 
-
 ###########
 # Phase 1 #
 ###########
@@ -38,6 +37,13 @@ def pick(paragraphs, select, k):
     """
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
+    count = 0
+    for i in paragraphs:
+        if select(i):
+            count += 1
+        if count == k+1:
+            return i
+    return ''
     # END PROBLEM 1
 
 
@@ -58,6 +64,14 @@ def about(subject):
 
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    def check(s):
+        s = lower(remove_punctuation(s))
+        seq = split(s)
+        for i in seq:
+            if i in subject: return True
+        return False
+    return check
+         
     # END PROBLEM 2
 
 
@@ -88,6 +102,16 @@ def accuracy(typed, source):
     source_words = split(source)
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    count = 0
+    i = 0
+    while(i<len(typed_words)):
+        if i<len(source_words):
+            if typed_words[i] == source_words[i]:
+                count += 1
+        i += 1
+    if i==0:
+        return float(source_words==typed_words)*100
+    return count/i*100
     # END PROBLEM 3
 
 
@@ -106,6 +130,8 @@ def wpm(typed, elapsed):
     assert elapsed > 0, "Elapsed time must be positive"
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    return len(typed)/elapsed*12
+
     # END PROBLEM 4
 
 
@@ -167,6 +193,17 @@ def autocorrect(typed_word, word_list, diff_function, limit):
     """
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    if typed_word in word_list: return typed_word
+
+    crct = word_list[0]
+    for i in word_list[1:]:
+        if diff_function(typed_word, crct, limit)>diff_function(typed_word, i, limit):
+            crct = i
+
+    if diff_function(typed_word, crct, limit)>limit:
+        return typed_word
+    
+    return crct
     # END PROBLEM 5
 
 
@@ -193,7 +230,11 @@ def furry_fixes(typed, source, limit):
     5
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+    if limit<0:
+        return 0
+    if len(typed)*len(source)==0:
+        return len(typed)+len(source)
+    return int(typed[0]!=source[0])+furry_fixes(typed[1:], source[1:], limit-int(typed[0]!=source[0]))
     # END PROBLEM 6
 
 
@@ -214,24 +255,36 @@ def minimum_mewtations(typed, source, limit):
     >>> minimum_mewtations("ckiteus", "kittens", big_limit) # ckiteus -> kiteus -> kitteus -> kittens
     3
     """
-    assert False, 'Remove this line'
-    if ___________: # Base cases should go here, you may add more base cases as needed.
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    if limit<0 or typed==source: # Base cases should go here, you may add more base cases as needed.
+        return 0
+    if len(typed)==1 or len(source)==1:
+        if len(typed)*len(source)==0:
+            return 1
+        elif len(typed)==1 and len(source)==1:
+            return 1
+        
     # Recursive cases should go below here
-    if ___________: # Feel free to remove or add additional cases
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
+    if len(typed)>len(source):
+        if typed[0]==source[0]:
+            return minimum_mewtations(typed[1:], source[1:], limit)
+        else:
+            typed=typed[1:]
+            return minimum_mewtations(typed, source, limit-1)
+    elif len(typed)<len(source):
+        if typed[0]==source[0]:
+            return minimum_mewtations(typed[1:], source[1:], limit)
+        else:
+            typed=source[0]+typed
+            return minimum_mewtations(typed[1:], source[1:], limit-1)
     else:
-        add = ... # Fill in these lines
-        remove = ...
-        substitute = ...
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-
+        count=0
+        i=0
+        while(i<len(typed)):
+            if typed[i]!=source[i]:
+                count+=1
+            i+=1
+        return count
+            
 
 # Ignore the line below
 minimum_mewtations = count(minimum_mewtations)
