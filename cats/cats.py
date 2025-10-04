@@ -257,33 +257,20 @@ def minimum_mewtations(typed, source, limit):
     """
     if limit<0 or typed==source: # Base cases should go here, you may add more base cases as needed.
         return 0
-    if len(typed)==1 or len(source)==1:
-        if len(typed)*len(source)==0:
-            return 1
-        elif len(typed)==1 and len(source)==1:
-            return 1
+    if typed in source or source in typed:
+        return abs(len(typed)-len(source))
+    if len(typed)==0:
+        return len(source)
+    if len(source)==0:
+        return len(typed)
         
-    # Recursive cases should go below here
-    if len(typed)>len(source):
-        if typed[0]==source[0]:
-            return minimum_mewtations(typed[1:], source[1:], limit)
-        else:
-            typed=typed[1:]
-            return minimum_mewtations(typed, source, limit-1)
-    elif len(typed)<len(source):
-        if typed[0]==source[0]:
-            return minimum_mewtations(typed[1:], source[1:], limit)
-        else:
-            typed=source[0]+typed
-            return minimum_mewtations(typed[1:], source[1:], limit-1)
-    else:
-        count=0
-        i=0
-        while(i<len(typed)):
-            if typed[i]!=source[i]:
-                count+=1
-            i+=1
-        return count
+    if typed[0]==source[0]:
+        return minimum_mewtations(typed[1:], source[1:], limit)
+    
+    return min(minimum_mewtations(typed, source[1:], limit-1)+1,
+               minimum_mewtations(typed[1:], source, limit-1)+1,
+               minimum_mewtations(typed[1:], source[1:], limit-1)+1
+               )
             
 
 # Ignore the line below
@@ -329,6 +316,15 @@ def report_progress(typed, source, user_id, upload):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    cnt=0
+    for i in range(len(typed)):
+        if typed[i]==source[i]:
+            cnt+=1
+        else: break
+    progress=cnt/len(source)
+    upload({'id':user_id, 'progress':progress})
+    return progress
+
     # END PROBLEM 8
 
 
@@ -350,10 +346,12 @@ def time_per_word(words, timestamps_per_player):
     >>> result['times']
     [[6, 3, 6, 2], [10, 6, 1, 2]]
     """
-    tpp = timestamps_per_player  # A shorter name (for convenience)
-    # BEGIN PROBLEM 9
-    times = []  # You may remove this line
-    # END PROBLEM 9
+    times=[]
+    for i in range(len(timestamps_per_player)):
+        tmp=[]
+        for j in range(len(timestamps_per_player[i])-1):
+            tmp.append(timestamps_per_player[i][j+1]-timestamps_per_player[i][j])
+        times.append(tmp)
     return {'words': words, 'times': times}
 
 
@@ -380,6 +378,21 @@ def fastest_words(words_and_times):
     word_indices = range(len(words))    # contains an *index* for each word
     # BEGIN PROBLEM 10
     "*** YOUR CODE HERE ***"
+    res=[]
+    for i in player_indices:
+        tmp=[]
+        for j in word_indices:
+            flag=1
+            for k in player_indices:
+                if times[i][j]>times[k][j]:
+                    flag=0
+                elif times[i][j]==times[k][j] and i>k:
+                    flag=0
+            if flag:
+                tmp.append(words[j])
+        res.append(tmp)
+    return res
+
     # END PROBLEM 10
 
 
